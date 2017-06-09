@@ -174,6 +174,27 @@ func getClientByIp(ipaddr string) (Client, int, error) {
 	return cli, -1, errors.ErrUnknownIssuer
 }
 
+func sendMessageToAllClient( message string){
+
+	for _, cli := range clientList {
+		sendMessageToClient(cli, message)
+	}
+}
+
+
+func sendMessageToClient(cli Client, msgS string) {
+
+	var msg Message
+	msg.TypeOfMessage = SEND_MESSAGE
+	msg.ClientID = cli.id
+	msg.ClientIP  = cli.ipAddr.IP.String()
+	msg.Message = msgS
+	msgJson, _ := json.Marshal(msg)
+	buf := []byte(msgJson)
+	ServerConn.WriteToUDP(buf, cli.ipAddr)
+
+}
+
 func readConsole() ( exit bool,  msg Message) {
 
 	for {
